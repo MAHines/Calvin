@@ -1,0 +1,52 @@
+// Names start with a letter and can contain letters, numbers and _. No spaces!
+
+// Identifying your experiments
+Set_Group_Name(name: "groupName")   // Determines where output goes
+Set_TA_Name(name: "your_TAs_Name")  // Determines where output goes
+
+// Labeling fresh, clean glassware
+Make_New_100ml_Beaker(newName: "beakerName")
+Make_New_50ml_Volumetric_Flask(newName: "flaskName")
+
+// Filling beakers with stock solutions
+Fill_Empty_100ml_Beaker_with_H2O(newName: "beakerName") // pH varies realistically, not 7.00
+Fill_Empty_100ml_Beaker_with_Standardized_Base(newName: "beakerName") // Reports exact concentration
+Fill_Empty_100ml_Beaker_with_Standardized_Acid(newName: "beakerName") // Reports exact concentration
+Fill_Empty_100ml_Beaker_with_Standardized_Buffer(newName: "beakerName") // Reports exact concentration
+Fill_Empty_100ml_Beaker_with_Unknown_Buffer(buffer: "bufferName", to: "beakerName")
+
+// Cleaning vessels after use
+Clean_And_Dry(name: "vesselName") // After cleaning, the name is removed from the vessel
+
+// Transferring solutions between vessels
+Transfer_Soln_with_20ml_Pipette(from: "vesselName", to: "vesselName")
+Transfer_Soln_with_Graduated_Cylinder(mL: volume, from: "vesselName", to: "vesselName")
+Fill_Volumetric_Flask_with_H2O(name: "flaskName")
+
+// Working with indicators
+Add_One_Drop_of_Indicator(indicator: "indicatorName", to: "vesselName") // Don't mix indicators!
+
+// Working with solid acids
+Add_Solid_Acid_to_Vessel(grams: targetMass, acid: "acidName", to: "vesselName") // Reports exact mass
+
+// Working with the buret
+Fill_50ml_Buret(from: "vesselName") // Cleans buret before filling
+Add_Soln_from_Buret(mL: targetVolume, to: "vesselName") // Must read volume before and after!
+Read_Buret_Volume() 
+
+// Making measurements
+Measure_pH(of: "vesselName")
+Observe_Color(of: "vesselName") // reports single colored box
+Take_Spectrum(of: "vesselName") // reports spectrum and exports spectrum as .csv
+Observe_Color_Range(of: "indicatorName", at: relativeConcentration) // 1 drop/50 mL = 1.0 conc
+
+// Performing a titration
+Titrate_Beaker_from_Buret_until_Color_Change(into: "vesselName") // reports buret readings, color observed
+
+// Other commands
+Observe_Volume(name: "vesselName") // Reports rough volume measurement
+Verbose_Reporting_On()  // Default behavior, Echoes your command to the notebook
+Verbose_Reporting_Off() // Turns off command echoing
+
+
+

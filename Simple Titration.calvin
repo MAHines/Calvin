@@ -1,0 +1,23 @@
+// Identifying our experiments
+Set_Group_Name(name: "Weimaraners")
+Set_TA_Name(name: "Hines")
+
+// Getting stock solutions
+Fill_Empty_100ml_Beaker_with_Standardized_Base(newName: "stock_base")
+Fill_Empty_100ml_Beaker_with_Standardized_Acid(newName: "stock_acid")
+
+// Making acid solution for titration
+Make_New_100ml_Beaker(newName: "titration_beaker")
+Transfer_Soln_with_20ml_Pipette(from: "stock_acid", to: "titration_beaker")
+Add_One_Drop_of_Indicator(indicator: "Thymol_blue", to: "titration_beaker")
+
+// Get the buret ready
+Fill_50ml_Buret(from: "stock_base")
+
+// Performing the titration
+Titrate_Beaker_from_Buret_until_Color_Change(into: "titration_beaker")
+
+// Take a visible spectrum
+Take_Spectrum(of: "titration_beaker")
+
+
