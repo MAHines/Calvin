@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language id="calvin" _name="Calvin" version="2.0" _section="Source">
+  <metadata>
+    <property name="mimetypes">text/plain</property>
+    <property name="globs">*.calvin</property>
+    <property name="line-comment-start">//</property>
+  </metadata>
+  <styles>
+	  <style id="comment" _name="Comment"  map-to="def:comment"/>
+	  <style id="keyword" _name="Keyword"  map-to="def:keyword"/>
+	  <style id="string"  _name="String"   map-to="def:string"/>
+	  <style id="builtin-function"  name="Builtin Function"      map-to="def:builtin"/>
+  </styles>
+    <definitions>
+      <context id="comment" style-ref="comment" end-at-line-end="true" class="comment" class-disabled="no-spell-check">
+	<start>\/\/</start>
+	<end>$</end>
+      </context>
+
+      <context id="keywords" style-ref="keyword">
+      	  <keyword>Make_New_50ml_Volumetric_Flask</keyword>
+          <keyword>Fill_Volumetric_Flask_with_H2O</keyword>
+          <keyword>Make_New_100ml_Beaker</keyword>
+          <keyword>Fill_Empty_100ml_Beaker_with_Standardized_Base</keyword>
+          <keyword>Fill_Empty_100ml_Beaker_with_Standardized_Acid</keyword>
+          <keyword>Fill_Empty_100ml_Beaker_with_Standardized_Buffer</keyword>
+          <keyword>Fill_Empty_100ml_Beaker_with_Unknown_Buffer</keyword>
+          <keyword>Fill_Empty_100ml_Beaker_with_H2O</keyword>
+          <keyword>Clean_And_Dry</keyword>
+          <keyword>Transfer_Soln_with_20ml_Pipette</keyword>
+          <keyword>Transfer_Soln_with_Graduated_Cylinder</keyword>
+          <keyword>Fill_50ml_Buret</keyword>
+          <keyword>Add_Soln_from_Buret</keyword>
+          <keyword>Read_Buret_Volume</keyword>
+          <keyword>Add_Solid_Acid_to_Vessel</keyword>
+          <keyword>Add_One_Drop_of_Indicator</keyword>
+          <keyword>Measure_pH</keyword>
+          <keyword>Observe_Color</keyword>
+          <keyword>Take_Spectrum</keyword>
+          <keyword>Observe_Color_Range</keyword>
+          <keyword>Titrate_Beaker_from_Buret_until_Color_Change</keyword>
+          <keyword>Verbose_Reporting_On</keyword>
+          <keyword>Verbose_Reporting_Off</keyword>
+          <keyword>Observe_Volume</keyword>
+          <keyword>Set_Group_Name</keyword>
+          <keyword>Set_TA_Name</keyword>
+      </context>
+
+      <context id="builtin-functions" style-ref="builtin-function">
+          <keyword>to</keyword>
+          <keyword>newName</keyword>
+          <keyword>from</keyword>
+          <keyword>indicator</keyword>
+          <keyword>name</keyword>
+          <keyword>mL</keyword>
+          <keyword>grams</keyword>
+          <keyword>acid</keyword>
+          <keyword>to</keyword>
+          <keyword>of</keyword>
+          <keyword>into</keyword>
+          <keyword>buffer</keyword>
+          <keyword>at</keyword>
+      </context>
+
+      <context id="string" style-ref="string" end-at-line-end="true" class="string" class-disabled="no-spell-check">
+        <start>"</start>
+        <end>"</end>
+      </context>
+
+      <!--Main context-->
+      <context id="calvin">
+          <include>
+	      <context ref="comment"/>	  
+	      <context ref="keywords"/>
+              <context ref="string"/>
+	      <context ref="builtin-functions"/>
+          </include>
+      </context>
+
+  </definitions>
+</language>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BBEditDocumentType</key>
+	<string>CodelessLanguageModule</string>
+	<key>BBLMLanguageDisplayName</key>
+	<string>Calvin</string>
+	<key>BBLMLanguageCode</key>
+	<string>Chem</string>
+	<key>BBLMColorsSyntax</key>
+	<true/>
+<!-- 
+	<key>BBLMScansFunctions</key>
+	<true/>
+ -->
+	<key>BBLMIsCaseSensitive</key>
+	<false/>
+<!-- 
+	<key>BBLMSupportsTextCompletion</key>
+	<true/>
+ -->
+	<key>BBLMSuffixMap</key>
+	<array>
+		<dict>
+			<key>BBLMLanguageSuffix</key> <string>.calvin</string>
+		</dict>
+	</array>
+	<key>BBLMKeywordList</key>
+	<array>
+        <string>Make_New_50ml_Volumetric_Flask</string>
+        <string>Fill_Volumetric_Flask_with_H2O</string>
+        <string>Make_New_100ml_Beaker</string>
+        <string>Fill_Empty_100ml_Beaker_with_Standardized_Base</string>
+        <string>Fill_Empty_100ml_Beaker_with_Standardized_Acid</string>
+        <string>Fill_Empty_100ml_Beaker_with_Standardized_Buffer</string>
+        <string>Fill_Empty_100ml_Beaker_with_Unknown_Buffer</string>
+        <string>Fill_Empty_100ml_Beaker_with_H2O</string>
+        <string>Clean_And_Dry</string>
+        <string>Transfer_Soln_with_20ml_Pipette</string>
+        <string>Transfer_Soln_with_Graduated_Cylinder</string>
+        <string>Fill_50ml_Buret</string>
+        <string>Add_Soln_from_Buret</string>
+        <string>Read_Buret_Volume</string>
+        <string>Add_Solid_Acid_to_Vessel</string>
+        <string>Add_One_Drop_of_Indicator</string>
+        <string>Measure_pH</string>
+        <string>Observe_Color</string>
+        <string>Take_Spectrum</string>
+        <string>Observe_Color_Range</string>
+        <string>Titrate_Beaker_from_Buret_until_Color_Change</string>
+        <string>Verbose_Reporting_On</string>
+        <string>Verbose_Reporting_Off</string>
+        <string>Observe_Volume</string>
+        <string>Set_Group_Name</string>
+        <string>Set_TA_Name</string>
+	</array>
+	<key>BBLMPredefinedNameList</key>
+	<array>
+        <string>to</string>
+        <string>newName</string>
+        <string>from</string>
+        <string>indicator</string>
+        <string>name</string>
+        <string>mL</string>
+        <string>grams</string>
+        <string>acid</string>
+        <string>to</string>
+        <string>of</string>
+        <string>into</string>
+        <string>buffer</string>
+        <string>at</string>
+    </array>
+	<!-- Specify a comment-out string: -->
+	<key>BBLMCommentLineDefault</key>   <string>//</string>
+	<key>Open Strings 1</key> <string>"</string>
+    <key>Close Strings 1</key> <string>"</string>
+	<key>Language Features</key>
+	<dict>
+		<key>Identifier and Keyword Characters</key>
+		<string>0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz.</string>
+		<key>Comment Pattern</key>
+		<string>(?&gt;//.*$)</string>
+<!-- 
+		<key>Function Pattern</key>
+		<string>(?x:
+	^[ \t]*
+	(?P&lt;function&gt;[Static ]*(?&gt;	function | macro | window )[ ]*
+		(?P&lt;function_name&gt;\w+\(.*\))
+		[\s\S]+?
+		^[ \t]*(?&gt; (end\b | endmacro\b) )
+	)
+)</string>
+ -->
+		<key>Skip Pattern</key>
+		<string>(?x:
+	(?&gt; (?P&gt;comment) | (?P&gt;string) )
+)</string>
+		<key>String Pattern</key>
+		<string>(?x:
+			(?&gt;	&quot;	(?s: \\. | [^&quot;] )*?		(?: &quot; | $)	)	|
+			(?&gt;	&apos;	(?s: \\. | [^&apos;] )*?		(?: &apos; | $)	)
+		)</string>
+ 	</dict>
+</dict>
+</plist>
