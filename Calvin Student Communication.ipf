@@ -19,7 +19,7 @@ constant kInsufficientVol = 1006
 constant kOverflow = 1007
 constant kMissingIndicator = 1008
 constant kConflictingIndicator = 1009
-constant kNoIndicatorInSolution = 1010
+constant kColorlessSolution = 1010
 constant kPHerror = 1011
 constant kMixingAcids = 1012
 constant kMixingIndicators = 1013
@@ -41,7 +41,7 @@ constant kTooManyCommands = 1028
 constant kNoSolidAcids = 1029
 constant kNoBuffers = 1030
 constant kTransferToSameVessel = 1031
-constant kConflictingString = 1032
+constant kConflictingString = 103
 
 Function WriteSimpleErrorToLog(errType, arg)
 variable errType
@@ -87,7 +87,7 @@ string arg
 		case kConflictingIndicator:
 			theNote = "This solution already contains " + arg + ". Adding a different indicator would be bad.\r"
 			break
-		case kNoIndicatorInSolution:
+		case kColorlessSolution:
 			theNote = "The solution in " + arg + " is colorless. Taking a spectrum would be pointless.\r"
 			break
 		case kPHerror:

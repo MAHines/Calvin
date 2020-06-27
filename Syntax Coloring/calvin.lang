@@ -18,15 +18,21 @@
       </context>
 
       <context id="keywords" style-ref="keyword">
+          <keyword>Make_New_Test_Tube</keyword>
+          <keyword>Make_New_25ml_Volumetric_Flask</keyword>
       	  <keyword>Make_New_50ml_Volumetric_Flask</keyword>
           <keyword>Fill_Volumetric_Flask_with_H2O</keyword>
           <keyword>Make_New_100ml_Beaker</keyword>
+          <keyword>Fill_Empty_100ml_Beaker_with_Standardized_KSCN</keyword>
+          <keyword>Fill_Empty_100ml_Beaker_with_Standardized_Ferric_Nitrate</keyword>
           <keyword>Fill_Empty_100ml_Beaker_with_Standardized_Base</keyword>
           <keyword>Fill_Empty_100ml_Beaker_with_Standardized_Acid</keyword>
           <keyword>Fill_Empty_100ml_Beaker_with_Standardized_Buffer</keyword>
           <keyword>Fill_Empty_100ml_Beaker_with_Unknown_Buffer</keyword>
           <keyword>Fill_Empty_100ml_Beaker_with_H2O</keyword>
           <keyword>Clean_And_Dry</keyword>
+          <keyword>Transfer_Soln_with_5ml_Pipette</keyword>
+          <keyword>Transfer_Soln_with_10ml_Pipette</keyword>
           <keyword>Transfer_Soln_with_20ml_Pipette</keyword>
           <keyword>Transfer_Soln_with_Graduated_Cylinder</keyword>
           <keyword>Fill_50ml_Buret</keyword>

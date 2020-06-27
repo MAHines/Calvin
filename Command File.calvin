@@ -5,8 +5,10 @@ Set_Group_Name(name: "groupName")   // Determines where output goes
 Set_TA_Name(name: "your_TAs_Name")  // Determines where output goes
 
 // Labeling fresh, clean glassware
-Make_New_100ml_Beaker(newName: "beakerName")
+Make_New_Test_Tube(newName: "testTubeName")
+Make_New_25ml_Volumetric_Flask(newName: "flaskName")
 Make_New_50ml_Volumetric_Flask(newName: "flaskName")
+Make_New_100ml_Beaker(newName: "beakerName")
 
 // Filling beakers with stock solutions
 Fill_Empty_100ml_Beaker_with_H2O(newName: "beakerName") // pH varies realistically, not 7.00
@@ -14,11 +16,15 @@ Fill_Empty_100ml_Beaker_with_Standardized_Base(newName: "beakerName") // Reports
 Fill_Empty_100ml_Beaker_with_Standardized_Acid(newName: "beakerName") // Reports exact concentration
 Fill_Empty_100ml_Beaker_with_Standardized_Buffer(newName: "beakerName") // Reports exact concentration
 Fill_Empty_100ml_Beaker_with_Unknown_Buffer(buffer: "bufferName", to: "beakerName")
+Fill_Empty_100ml_Beaker_with_Standardized_KSCN(newName: "beakerName") // Reports exact concentration
+Fill_Empty_100ml_Beaker_with_Standardized_Ferric_Nitrate(newName: "beakerName") // Reports exact concentration
 
 // Cleaning vessels after use
 Clean_And_Dry(name: "vesselName") // After cleaning, the name is removed from the vessel
 
 // Transferring solutions between vessels
+Transfer_Soln_with_5ml_Pipette(from: "vesselName", to: "vesselName")
+Transfer_Soln_with_10ml_Pipette(from: "vesselName", to: "vesselName")
 Transfer_Soln_with_20ml_Pipette(from: "vesselName", to: "vesselName")
 Transfer_Soln_with_Graduated_Cylinder(mL: volume, from: "vesselName", to: "vesselName")
 Fill_Volumetric_Flask_with_H2O(name: "flaskName")

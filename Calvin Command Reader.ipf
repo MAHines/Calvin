@@ -17,14 +17,20 @@ Function InitCommandReader()
 	
 	make/n=0/o/t validCommands
 	wave/t validCommands
+	InsertCommand("Make_New_25ml_Volumetric_Flask")
 	InsertCommand("Make_New_50ml_Volumetric_Flask")
 	InsertCommand("Fill_Volumetric_Flask_with_H2O")
+	InsertCommand("Make_New_Test_Tube")
 	InsertCommand("Make_New_100ml_Beaker")
 	InsertCommand("Fill_Empty_100ml_Beaker_with_Standardized_Base")
 	InsertCommand("Fill_Empty_100ml_Beaker_with_Standardized_Acid")
+	InsertCommand("Fill_Empty_100ml_Beaker_with_Standardized_KSCN")
+	InsertCommand("Fill_Empty_100ml_Beaker_with_Standardized_Ferric_Nitrate")
 	InsertCommand("Fill_Empty_100ml_Beaker_with_H2O")
 	InsertCommand("Fill_Empty_100ml_Beaker_with_Standardized_Buffer")
 	InsertCommand("Fill_Empty_100ml_Beaker_with_Unknown_Buffer")
+	InsertCommand("Transfer_Soln_with_5ml_Pipette")
+	InsertCommand("Transfer_Soln_with_10ml_Pipette")
 	InsertCommand("Transfer_Soln_with_20ml_Pipette")
 	InsertCommand("Transfer_Soln_with_Graduated_Cylinder")
 	InsertCommand("Fill_50ml_Buret")
@@ -246,6 +252,7 @@ string fileName
 	fileName = ReplaceString("\"", fileName, "_")
 	fileName = ReplaceString("<", fileName, "_")
 	fileName = ReplaceString(">", fileName, "_")
+	fileName = ReplaceString("'", fileName, "")		// Added to fix problems with Beer's Law
 	return fileName
 End
 Function MakeAllTAFolders()
@@ -291,9 +298,10 @@ String unixCmd
 	sprintf igorCmd, "do shell script \"%s\"", unixCmd
 //	Print igorCmd		// For debugging only
 
-	ExecuteScriptText/UNQ igorCmd
-	if(strsearch(S_value,  "No such file or directory", 0) > 0)
-		print "EUSC Error:" + S_value
+	ExecuteScriptText/UNQ/Z igorCmd
+	if(V_flag != 0)
+		print "Command: " + igorCmd
+		print "EUSC Error: " + S_value
 		print "ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!"
 		print "ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!"
 		print "ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!"
@@ -312,8 +320,9 @@ String unixCmd
 	sprintf igorCmd, "do shell script \"ls '%s'\"", unixCmd
 
 	ExecuteScriptText/UNQ/Z igorCmd
-	if(strsearch(S_value,  "No such file or directory", 0) > 0)
-		print "Check path error:" + S_value
+	if(V_flag != 0)
+		print "Command: " + igorCmd
+		print "Check Path Error: " + S_value
 		print "ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!"
 		print "ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!"
 		print "ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!"
@@ -436,11 +445,15 @@ string line
 			err = (NumArgs(args) == 0) ? 0 : -1
 			cleanArgs = ""
 			break
+		case "Make_New_25ml_Volumetric_Flask":
 		case "Make_New_50ml_Volumetric_Flask":
 		case "Fill_Volumetric_Flask_with_H2O":
+		case "Make_New_Test_Tube":
 		case "Make_New_100ml_Beaker":
 		case "Fill_Empty_100ml_Beaker_with_Standardized_Base":
 		case "Fill_Empty_100ml_Beaker_with_Standardized_Acid":
+		case "Fill_Empty_100ml_Beaker_with_Standardized_KSCN":
+		case "Fill_Empty_100ml_Beaker_with_Standardized_Ferric_Nitrate":
 		case "Fill_Empty_100ml_Beaker_with_Standardized_Buffer":
 		case "Fill_Empty_100ml_Beaker_with_H2O":
 		case "Fill_50ml_Buret":
@@ -460,6 +473,8 @@ string line
 				err = -1
 			endif
 			break
+		case "Transfer_Soln_with_5ml_Pipette":
+		case "Transfer_Soln_with_10ml_Pipette":
 		case "Transfer_Soln_with_20ml_Pipette":
 		case "Fill_Empty_100ml_Beaker_with_Unknown_Buffer":
 		case "Add_One_Drop_of_Indicator":

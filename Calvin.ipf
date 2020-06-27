@@ -102,10 +102,15 @@ string intoBeakerName
 	if(validVessel(intoBeakerName) < 1)
 		return -1
 	endif
+	if(reservedName(intoBeakerName))
+		WriteSimpleErrorToLog(kConflictingString, intoBeakerName)
+		return -1
+	endif
+
 	// Make sure there is a valid indicator in the solution and that pH measurement is working
 	indNum = indicatorNum(intoBeakerName)
 	if(indNum < 0)
-		WriteSimpleErrorToLog(kNoIndicatorInSolution, intoBeakerName)
+		WriteSimpleErrorToLog(kColorlessSolution, intoBeakerName)
 		return -1
 	endif
 	thePH = pH(intoBeakerName)
@@ -205,6 +210,27 @@ Function Make_50ml_Buret()
 	SetMaxVolume("Buret_mah", 0.050)	
 	return(1)
 End
+Function Make_New_Test_Tube(beakerName)
+string beakerName
+
+	string theNote
+	
+	// Make a wave to hold the solution
+	if(exists(beakerName) == 1)
+		WriteSimpleErrorToLog(kVesselExists, beakerName)
+		return(-1)
+	endif
+	if(reservedName(beakerName))
+		WriteSimpleErrorToLog(kConflictingString, beakerName)
+		return -1
+	endif
+
+	MakeEmptyVessel(beakerName)
+	SetMaxVolume(beakerName, 0.020)	
+	theNote = "A clean test tube was named " + beakerName + ".\r"
+	WriteToLog(theNote)
+	return(1)
+End
 Function Make_New_100ml_Beaker(beakerName)
 string beakerName
 
@@ -214,6 +240,10 @@ string beakerName
 	if(exists(beakerName) == 1)
 		WriteSimpleErrorToLog(kVesselExists, beakerName)
 		return(-1)
+	endif
+	if(reservedName(beakerName))
+		WriteSimpleErrorToLog(kConflictingString, beakerName)
+		return -1
 	endif
 	MakeEmptyVessel(beakerName)
 	SetMaxVolume(beakerName, 0.100)	
@@ -298,6 +328,36 @@ string beakerName
 	WriteToLog(theNote)
 
 End
+Function Fill_Empty_100ml_Beaker_with_Standardized_KSCN(beakerName)
+string beakerName
+	
+	string theNote, theConc
+	
+	if(Make_New_100ml_Beaker(beakerName) < 0)
+		return -1
+	endif
+	setSCNmoles(beakerName, concStandardizedSCN() * 0.100)
+	setVolume(beakerName, 0.100)
+	sprintf theConc, "%.3e", concStandardizedSCN()
+	theNote = "The beaker " + beakerName + " was filled with 100 ml of " + theConc +  " M standardized KSCN.\r"
+	WriteToLog(theNote)
+
+End
+Function Fill_Empty_100ml_Beaker_with_Standardized_Ferric_Nitrate(beakerName)
+string beakerName
+	
+	string theNote, theConc
+	
+	if(Make_New_100ml_Beaker(beakerName) < 0)
+		return -1
+	endif
+	setFeMoles(beakerName, concStandardizedFe() * 0.100)
+	setVolume(beakerName, 0.100)
+	sprintf theConc, "%.4f", concStandardizedFe()
+	theNote = "The beaker " + beakerName + " was filled with 100 ml of " + theConc +  " M standardized ferric nitrate.\r"
+	WriteToLog(theNote)
+
+End
 Function Fill_Empty_100ml_Beaker_with_H2O(beakerName)
 string beakerName
 	
@@ -314,8 +374,27 @@ string beakerName
 	WriteToLog(theNote)
 End
 
+Function Make_New_25ml_Volumetric_Flask(flaskName)
+string flaskName
+
+	variable err
+	
+	err = Make_New_Volumetric_Flask(flaskName, 0.025)
+	return err
+End
+
 Function Make_New_50ml_Volumetric_Flask(flaskName)
 string flaskName
+
+	variable err
+	
+	err = Make_New_Volumetric_Flask(flaskName, 0.050)
+	return err
+End
+
+Function Make_New_Volumetric_Flask(flaskName, volume)	// Volume in liters
+string flaskName
+variable volume
 
 	string theNote
 	
@@ -324,12 +403,17 @@ string flaskName
 		WriteSimpleErrorToLog(kVesselExists, flaskName)
 		return(-1)
 	endif
+	if(reservedName(flaskName))
+		WriteSimpleErrorToLog(kConflictingString, "vesselName")
+		return -1
+	endif
 	MakeEmptyVessel(flaskName)
-	SetMaxVolume(flaskName, 0.050)	
-	theNote = "A clean 50 ml volumetric flask was named " + flaskName + ".\r"
+	SetMaxVolume(flaskName, volume)	
+	theNote = "A clean " + num2istr(volume * 1000) + " ml volumetric flask was named " + flaskName + ".\r"
 	WriteToLog(theNote)
 	return(1)
 End
+
 
 Function Add_Solid_Acid_to_Vessel(targetMass, nameOfAcid, vesselName)
 string vesselName, nameOfAcid
@@ -339,6 +423,10 @@ variable targetMass
 	variable actualMass, iMolxsOH, actualMoles, err
 	NVAR useErrors = root:MAH:useErrors
 	
+	if(reservedName(vesselName))
+		WriteSimpleErrorToLog(kConflictingString, vesselName)
+		return -1
+	endif
 	if(validVessel(vesselName) < 1)
 		return -1
 	endif
@@ -403,14 +491,14 @@ string flaskName
 	wave H2O_Reservoir_mah
 	
 	// Test for valid flask
-	if(valid50mlVolumetricFlask(flaskName) < 0.1)
+	if(validVolumetricFlask(flaskName) < 0.1)
 		return -1
-	elseif(volume(flaskName) >= 0.0495)
+	elseif(volume(flaskName) >= 0.99 * maxVolume(flaskName))
 		WriteSimpleErrorToLog(kFlaskFull, flaskName)
 		return 1
 	else
 		oldVol = volume(flaskName)
-		newVol = 0.050 + VolumeError("vol_flask",0.050)
+		newVol = maxVolume(flaskName) + VolumeError("vol_flask", maxVolume(flaskName))
 		AddSolnToSoln("H2O_Reservoir_mah", flaskName, newVol - oldVol)
 		theNote = "The flask named " + flaskName + " was filled with H2O to the mark.\r"
 		WriteToLog(theNote)
@@ -426,13 +514,15 @@ constant k_solnVolIndex = 4
 constant k_indicatorIndex = 5
 constant k_maxVolIndex = 6
 constant k_indMolIndex = 7
+constant k_FeMolIndex = 8
+constant k_SCNmolIndex = 9
 
 Function MakeEmptyVessel(vesselName)
 string vesselName
 	
 	string keyStr
 	
-	make/n=8 $vesselName
+	make/n=10 $vesselName
 	wave beaker = $vesselName
 	
 	keyStr = "acidName:" + "none" + ";"
@@ -445,6 +535,11 @@ Function Clean_and_Dry(vesselName)
 string vesselName
 	
 	string theNote
+	
+	if(reservedName(vesselName))
+		WriteSimpleErrorToLog(kConflictingString, "vesselName")
+		return -1
+	endif
 	
 	if(!validVessel(VesselName))
 		return -1
@@ -509,6 +604,11 @@ variable targetVolume
 
 	variable err
 	
+	if(reservedName(toVesselName))
+		WriteSimpleErrorToLog(kConflictingString, toVesselName)
+		return -1
+	endif
+
 	targetVolume /= 1000
 	if(volume("Buret_mah") <= 0.00005)
 		WriteSimpleErrorToLog(kBuretEmpty, "")
@@ -523,26 +623,57 @@ variable targetVolume
 	return err
 End
 // ---------------------------- Transferring Solutions -----------------------------------------
+Function Transfer_Soln_with_5ml_pipette(fromVesselName, toVesselName)
+string fromVesselName, toVesselName
+
+	variable err
+	err = Transfer_Soln_with_pipette(fromVesselName, toVesselName, 0.005)
+	return err
+End
+Function Transfer_Soln_with_10ml_pipette(fromVesselName, toVesselName)
+string fromVesselName, toVesselName
+
+	variable err
+	err = Transfer_Soln_with_pipette(fromVesselName, toVesselName, 0.010)
+	return err
+End
 Function Transfer_Soln_with_20ml_pipette(fromVesselName, toVesselName)
 string fromVesselName, toVesselName
 
 	variable err
+	err = Transfer_Soln_with_pipette(fromVesselName, toVesselName, 0.020)
+	return err
+End
+Function Transfer_Soln_with_pipette(fromVesselName, toVesselName, volume)	// Volume in liters
+string fromVesselName, toVesselName
+variable volume
+
+	variable err
 	string theNote
 
-	err = Transfer_Soln(fromVesselName, toVesselName, 0.020, "pipette")
+	if(reservedName(toVesselName))
+		WriteSimpleErrorToLog(kConflictingString, toVesselName)
+		return -1
+	endif
+	err = Transfer_Soln(fromVesselName, toVesselName, volume, "pipette")
 	if(err > 0)
-		theNote = "Pipetted 20 ml of solution from " + fromVesselName + " to " + toVesselName + ".\r"
+		theNote = "Pipetted " + num2istr(volume * 1000) + " ml of solution from " + fromVesselName + " to " + toVesselName + ".\r"
 		WriteToLog(theNote)
 	endif
 	return err
 End
-Function Transfer_Soln_with_Graduated_Cylinder(targetVolume, fromVesselName, toVesselName, )
+Function Transfer_Soln_with_Graduated_Cylinder(targetVolume, fromVesselName, toVesselName)
 string fromVesselName, toVesselName
 variable targetVolume
 
 	variable err, volToBeTransferred, nextTransfer
 	string theNote
 	
+	if(reservedName(toVesselName))
+		WriteSimpleErrorToLog(kConflictingString, toVesselName)
+		return -1
+	endif
+
 	targetVolume /= 1000
 	volToBeTransferred = targetVolume
 	
@@ -583,7 +714,7 @@ string fromVesselName, toVesselName
 	if(!validVessel(toVesselName))
 		return -1
 	endif
-	
+		
 	if(CmpStr(fromVesselName, toVesselName, 0) == 0)
 		WriteSimpleErrorToLog(kTransferToSameVessel, fromVesselName)
 		return -1
@@ -642,8 +773,8 @@ Function AddSolnToSoln(fromVesselName, toVesselName, actualVolume) // Do error c
 string fromVesselName, toVesselName
 variable actualVolume
 	
-	variable iVol, iMolHA, iMolA, iMolxsOH, iMolxsH, iMolH, newIndNum, iMolInd
-	variable newVol, newMol_HA, newMol_A, newMol_xsOH, newMol_xsH
+	variable iVol, iMolHA, iMolA, iMolxsOH, iMolxsH, iMolH, newIndNum, iMolInd, iMolFe, iMolSCN
+	variable newVol, newMol_HA, newMol_A, newMol_xsOH, newMol_xsH, newMol_Fe, newMol_SCN
 	variable finished = 0
 	wave vessel = $toVesselName
 	
@@ -656,6 +787,8 @@ variable actualVolume
 	iMolxsH = xsHconc(fromVesselName) * actualVolume
 	iMolxsOH = xsOHConc(fromVesselName) * actualVolume
 	iMolInd = indConc(fromVesselName) * actualVolume
+	iMolFe = FeConc(fromVesselName) * actualVolume
+	iMolSCN = SCNconc(fromVesselName) * actualVolume
 	
 	// First add all moles from first vessel to second vessel
 	setAcidMoles(toVesselName, acidMoles(toVesselName) + iMolHA)
@@ -663,6 +796,8 @@ variable actualVolume
 	setXsHMoles(toVesselName, xsHMoles(toVesselName) + iMolxsH)
 	setXsOHMoles(toVesselName, xsOHMoles(toVesselName) + iMolxsOH)
 	setIndMoles(toVesselName, indMoles(toVesselName) + iMolInd)
+	setFeMoles(toVesselName, FeMoles(toVesselName) + iMolFe)
+	setSCNmoles(toVesselName, SCNmoles(toVesselName) + iMolSCN)
 	
 	// Now subtract moles from first vessel
 	setAcidMoles(fromVesselName, acidMoles(fromVesselName) - iMolHA)
@@ -670,6 +805,8 @@ variable actualVolume
 	setXsHMoles(fromVesselName, xsHMoles(fromVesselName) - iMolxsH)
 	setXsOHMoles(fromVesselName, xsOHMoles(fromVesselName) - iMolxsOH)
 	setIndMoles(fromVesselName, indMoles(fromVesselName) - iMolInd)
+	setFeMoles(fromVesselName, FeMoles(fromVesselName) - iMolFe)
+	setSCNmoles(fromVesselName, SCNmoles(fromVesselName) - iMolSCN)
 	
 	// Update volumes, because they are needed for upcoming conc calculations
 	setVolume(fromVesselName, volume(fromVesselName) - actualVolume)
@@ -724,6 +861,10 @@ string vesselName, indicatorName
 	endif
 	
 	// Test for valid flask
+	if(reservedName(vesselName))
+		WriteSimpleErrorToLog(kConflictingString, vesselName)
+		return -1
+	endif
 	if(validVessel(vesselName) < 1)
 		return -1
 	endif
@@ -743,7 +884,7 @@ End
 Function Observe_Color(vesselName)
 string vesselName
 	
-	variable indNum, thePH
+	variable indNum, thePH, ironConc
 	string theNote, topWindow
 	STRUCT color theColor
 
@@ -753,8 +894,9 @@ string vesselName
 
 	// Make sure there is a valid indicator in the solution	
 	indNum = indicatorNum(vesselName)
-	if(indNum < 0)
-		WriteSimpleErrorToLog(kNoIndicatorInSolution, vesselName)
+	ironConc = FeConc(vesselName)
+	if((indNum < 0) && !(ironConc > 1e-6))
+		WriteSimpleErrorToLog(kColorlessSolution, vesselName)
 		return -1
 	endif
 	thePH = pH(vesselName)
@@ -783,10 +925,7 @@ Function measureColor(vesselName, theColor)	// No error checking
 string vesselName
 STRUCT color &theColor
 	
-	variable indNum
-	
-	indNum = indicatorNum(vesselName)
-	MakeSpectrum(indNum, indConc(vesselName), indPKa(indNum), pH(vesselName))
+	MakeSpectrum(vesselName)
 	wave spectrum = root:MAH:curSpectrum
 	calcColorOfSpectrum(spectrum, theColor, 1)
 End
@@ -809,9 +948,9 @@ variable relativeConcentration
 	make/n=(80,1,4)/o root:MAH:colorSwatch
 	wave swatch = root:MAH:colorSwatch
 	SetScale/P x indPKA(indNum)-2, 4/80,"", swatch
-	MakeSpectrum(indNum, 1.0, indPKa(indNum), pnt2x(swatch, ii))
+	MakeIndSpectrum(indNum, 1.0, indPKa(indNum), pnt2x(swatch, ii))
 	do
-		MakeSpectrum(indNum, relativeConcentration, indPKa(indNum), pnt2x(swatch, ii))
+		MakeIndSpectrum(indNum, relativeConcentration, indPKa(indNum), pnt2x(swatch, ii))
 		wave spectrum = root:MAH:curSpectrum
 		calcColorOfSpectrum(spectrum, theColor, 1)
 		swatch[ii][0][0] = theColor.rr
@@ -835,28 +974,19 @@ Function Take_Spectrum(vesselName)
 string vesselName
 
 	string theNote, topWindow, fileName
-	variable indNum, thePH, refNum, ii
+	variable err, ii, refNum
 	NVAR gSpectrumNumber = root:MAH:gSpectrumNumber
 	
 	// Test for valid flask
 	if(validVessel(vesselName) < 1)
 		return -1
 	endif
-
-	// Make sure there is a valid indicator in the solution
-	indNum = indicatorNum(vesselName)
-	if(indNum < 0)
-		WriteSimpleErrorToLog(kNoIndicatorInSolution, vesselName)
-		return -1
-	endif
-	thePH = pH(vesselName)
-	if(thePH < 0)
-		WriteSimpleErrorToLog(kPHerror, vesselName)
-		return -1
-	endif
 	
-	// Generate the spectrum and write it to the notebook
-	MakeSpectrum(indNum, indConc(vesselName), indPKa(indNum), thePH)
+	err = MakeSpectrum(vesselName)
+	if(err < 0)
+		return err
+	endif
+
 	wave spectrum = root:MAH:curSpectrum
 	duplicate/o spectrum, root:MAH:clippedSpectrum
 	wave clippedSpectrum = root:MAH:clippedSpectrum
@@ -887,7 +1017,63 @@ string vesselName
 	WriteToLog(theNote)
 	gSpectrumNumber += 1
 End
-Function MakeSpectrum(indicatorNum, indicatorConc, pKa, pH) // No error checking. Makes wave "curSpectrum"
+Function MakeSpectrum(vesselName)
+string vesselName
+
+	variable indNum, thePH, refNum, ii, ironConc, specExists
+	NVAR gSpectrumNumber = root:MAH:gSpectrumNumber
+
+	// Make sure there is either a valid indicator in the solution or some Fe
+	indNum = indicatorNum(vesselName)
+	ironConc = FeConc(vesselName)
+	if((indNum < 0) && !(ironConc > 1e-6))
+		WriteSimpleErrorToLog(kColorlessSolution, vesselName)
+		return -1
+	endif
+	thePH = pH(vesselName)
+	if(thePH < 0)
+		WriteSimpleErrorToLog(kPHerror, vesselName)
+		return -1
+	endif
+	
+	// Generate the spectrum and write it to the notebook
+	specExists = 0
+	if(ironConc > 1e-6)
+		MakeFeSpectrum(FeConc(vesselName), SCNconc(vesselName))
+		specExists = 1
+	endif
+	if(!(indNum < 0))
+		if(specExists > 0)
+			wave spectrum = root:MAH:curSpectrum
+			duplicate/FREE spectrum, tempSpectrum
+		endif
+		MakeIndSpectrum(indNum, indConc(vesselName), indPKa(indNum), thePH)
+		if(specExists > 0)
+			spectrum += tempSpectrum
+		endif 
+	endif
+	return 1
+End
+Function MakeFeSpectrum(FeConc, SCNconc)	// Unequilibrated concentrations
+variable FeConc, SCNconc
+	
+	variable alpha, abeta, FeSCNconc, equilFeConc, ratFe, ratFeSCN, equilSCNConc
+	alpha = FeConc + SCNconc + 1/139.732		// K = 140 M^–1
+	abeta = FeConc * SCNconc
+	FeSCNconc = 0.5 * (alpha - sqrt(alpha^2 - 4 * abeta))	// From solving quadratic equil eqn
+	equilFeConc = FeConc - FeSCNconc
+	equilSCNConc = SCNconc - FeSCNconc
+	
+	make/n=(800 - 380 + 1)/o root:MAH:curSpectrum
+	wave curSpectrum = root:MAH:curSpectrum
+	SetScale/I x 380,800,"nm", curSpectrum
+	wave FeSpectrum = root:MAH:Ferric_ion, FeSCNspectrum = root:MAH:FeSCN
+	ratFeSCN = FeSCNconc/(wavemax(FeSCNspectrum)/6120)
+	ratFe = equilFeConc/0.01
+	curSpectrum = ratFe * FeSpectrum + ratFeSCN * FeSCNspectrum
+End
+
+Function MakeIndSpectrum(indicatorNum, indicatorConc, pKa, pH) // No error checking. Makes wave "curSpectrum"
 variable indicatorNum, indicatorConc, pKa, pH
 
 	variable pctDeprotonated
@@ -1051,6 +1237,17 @@ string theName
 	WriteSimpleErrorToLog(kMissingBuffer, theName)
 	return -1
 End
+Function reservedName(theName)	// returns 1 if reserved name, 0 if not
+string theName
+	
+	if(stringmatch(theName, "Buret_mah"))
+		return 1
+	elseif(stringMatch(theName, "H2O_Reservoir_mah"))
+		return 1
+	else
+		return 0
+	endif
+End
 Function validVessel(theName)	// returns 1 if valid, 0 if not
 string theName
 
@@ -1063,30 +1260,20 @@ string theName
 		return(0)
 	endif
 End
-Function valid50mlBeaker(theName)	// returns 1 if successful, 0 if not
+Function validVolumetricFlask(theName)	// returns 1 if successful, 0 if not
 string theName
 
 	string theInfo
 	
+	if(reservedName(theName))
+		WriteSimpleErrorToLog(kConflictingString, theName)
+		return -1
+	endif
+
 	if(exists(theName) == 1)
 		if(abs(maxVolume(theName) - 0.050) < 0.001)
 			return(1)
-		else
-			WriteSimpleErrorToLog(kNotBeaker, theName)
-			return(0)
-		endif
-	else
-		WriteSimpleErrorToLog(kVesselMissing, theName)
-		return(0)
-	endif
-End
-Function valid50mlVolumetricFlask(theName)	// returns 1 if successful, 0 if not
-string theName
-
-	string theInfo
-	
-	if(exists(theName) == 1)
-		if(abs(maxVolume(theName) - 0.050) < 0.001)
+		elseif(abs(maxVolume(theName) - 0.025) < 0.001)
 			return(1)
 		else
 			WriteSimpleErrorToLog(kNotFlask, theName)
@@ -1142,6 +1329,20 @@ variable newMoles
 	wave soln = $solnName
 	soln[k_indMolIndex] = newMoles
 End
+Function setFeMoles(solnName, newMoles)
+string solnName
+variable newMoles
+	
+	wave soln = $solnName
+	soln[k_FeMolIndex] = newMoles
+End
+Function setSCNmoles(solnName, newMoles)
+string solnName
+variable newMoles
+	
+	wave soln = $solnName
+	soln[k_SCNmolIndex] = newMoles
+End
 Function setVolume(beakerName, newVol)		// returns 1 if OK, -1 if overfilled
 string beakerName
 variable newVol
@@ -1194,6 +1395,18 @@ string solnName
 	wave soln = $solnName
 	return soln[k_indMolIndex]
 End
+Function FeMoles(solnName)
+string solnName
+	
+	wave soln = $solnName
+	return soln[k_FeMolIndex]
+End
+Function SCNmoles(solnName)
+string solnName
+	
+	wave soln = $solnName
+	return soln[k_SCNmolIndex]
+End
 
 Function acidConc(solnName)
 string solnName
@@ -1239,6 +1452,24 @@ string solnName
 	
 	vol = soln[k_solnVolIndex]
 	return vol > 0.001 ? soln[k_indMolIndex]/vol : 0
+End
+Function FeConc(solnName)
+string solnName
+	
+	wave soln = $solnName
+	variable vol
+	
+	vol = soln[k_solnVolIndex]
+	return vol > 0.001 ? soln[k_FeMolIndex]/vol : 0
+End
+Function SCNconc(solnName)
+string solnName
+	
+	wave soln = $solnName
+	variable vol
+	
+	vol = soln[k_solnVolIndex]
+	return vol > 0.001 ? soln[k_SCNmolIndex]/vol : 0
 End
 Function buffer_acidMolarity(bufferNum)
 variable bufferNum
@@ -1371,6 +1602,8 @@ variable targetHOH, targetBuffer
 
 	NVAR concStdOH = root:MAH:concStdOH,concStdH = root:MAH:concStdH, useErrors = root:MAH:useErrors	
 	NVAR pHofStdH2O = root:MAH:pHofStdH2O, concStdBuffer = root:MAH:concStdBuffer
+	NVAR concStdSCN = root:MAH:concStdSCN, concStdFe = root:MAH:concStdFe
+
 	
 	concStdOH = targetHOH + useErrors * enoise(0.15 * targetHOH)
 	concStdH = targetHOH + useErrors * enoise(0.15 * targetHOH)
@@ -1380,6 +1613,8 @@ variable targetHOH, targetBuffer
 		pHofStdH2O = 7.0
 	endif
 	concStdBuffer = targetBuffer + useErrors * enoise(0.15 * targetBuffer)
+	concStdSCN = 2e-4 * (1 + useErrors * enoise(0.15))
+	concStdFe = 0.20 * (1 + useErrors * enoise(0.15))
 End
 Function concStandardizedOH()
 
@@ -1390,6 +1625,16 @@ Function concStandardizedH()
 
 	NVAR concStdH = root:MAH:concStdH
 	return concStdH
+End
+Function concStandardizedSCN()
+
+	NVAR concStdSCN = root:MAH:concStdSCN
+	return concStdSCN
+End
+Function concStandardizedFe()
+
+	NVAR concStdFe = root:MAH:concStdFe
+	return concStdFe
 End
 Function concStandardizedBuffer()
 
@@ -1443,11 +1688,12 @@ Function InitializeData()
 	endif
 	variable/g useErrors = 1, gVerboseReporting = 1, gSpectrumNumber, gTAnumber
 	variable/g gGroupNumber, gMaxCommands, concStdBuffer, concStdOH, concStdH, pHofStdH2O
+	variable/g concStdSCN, concStdFe
 	variable/g gSolidAcidsEnabled, gBuffersEnabled, gLastLineWasComment, gIgorMenusHidden
 	string/g gRunTime, gCmdFileName, gBadGroupName, gBadTAName, gGroupName
 	string/g gCalvinAcidsMenuString, gCalvinBuffersMenuString, gCalvinHideMenuString
 	
-	gMaxCommands = 50
+	gMaxCommands = 60
 	gSolidAcidsEnabled = 1
 	gBuffersEnabled = 1
 	gIgorMenusHidden = 1
@@ -1474,6 +1720,7 @@ Function InitializeData()
 	
 	wave/t ind_acidSpectrum, ind_baseSpectrum
 	
+	// Load spectra of indicators
 	ii = 0
 	do
 		if(!exists(ind_acidSpectrum[ii]))
@@ -1486,6 +1733,11 @@ Function InitializeData()
 		endif
 		ii = ii + 1		
 	while(ii < numpnts(ind_acidSpectrum) - 1) // Last point in wave is error
+	
+	// Load other spectra
+	LoadWave/H/P=startup/O/q "FeSCN.ibw"
+	LoadWave/H/P=startup/O/q "Ferric_ion.ibw"
+	
 	SetDataFolder savedDF
 	InitCommandReader()
 End
@@ -1497,7 +1749,7 @@ Function SetTheLocations()
 		return -1	// User hit cancel
 	endif
 	PathInfo/S cloudFolder
-	NewPath/o/q/M="Choose the cloud folder" cloudFolder
+	NewPath/o/q/M="Choose the cloud outbox folder" cloudFolder
 	if(V_flag != 0)
 		return -1	// User hit cancel
 	endif
@@ -1517,7 +1769,6 @@ Function NewExperiments()
 	SVAR gRunTime = root:MAH:gRunTime, gGroupName = root:MAH:gGroupName
 	SVAR gBadGroupName = root:MAH:gBadGroupName, gBadTAName = root:MAH:gBadTAName
 	
-	useErrors = 0
 	gSpectrumNumber = 1
 	refreshStandards(0.100, 0.050) // H/OH conc, buffer conc
 	gTAnumber = -1

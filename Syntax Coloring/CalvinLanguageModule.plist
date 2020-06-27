@@ -28,15 +28,21 @@
 	</array>
 	<key>BBLMKeywordList</key>
 	<array>
+        <string>Make_New_Test_Tube</string>
+        <string>Make_New_25ml_Volumetric_Flask</string>
         <string>Make_New_50ml_Volumetric_Flask</string>
         <string>Fill_Volumetric_Flask_with_H2O</string>
         <string>Make_New_100ml_Beaker</string>
+        <string>Fill_Empty_100ml_Beaker_with_Standardized_KSCN</string>
+        <string>Fill_Empty_100ml_Beaker_with_Standardized_Ferric_Nitrate</string>
         <string>Fill_Empty_100ml_Beaker_with_Standardized_Base</string>
         <string>Fill_Empty_100ml_Beaker_with_Standardized_Acid</string>
         <string>Fill_Empty_100ml_Beaker_with_Standardized_Buffer</string>
         <string>Fill_Empty_100ml_Beaker_with_Unknown_Buffer</string>
         <string>Fill_Empty_100ml_Beaker_with_H2O</string>
         <string>Clean_And_Dry</string>
+        <string>Transfer_Soln_with_5ml_Pipette</string>
+        <string>Transfer_Soln_with_10ml_Pipette</string>
         <string>Transfer_Soln_with_20ml_Pipette</string>
         <string>Transfer_Soln_with_Graduated_Cylinder</string>
         <string>Fill_50ml_Buret</string>
