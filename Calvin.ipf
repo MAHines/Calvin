@@ -608,6 +608,9 @@ variable targetVolume
 		WriteSimpleErrorToLog(kConflictingString, toVesselName)
 		return -1
 	endif
+	if(validVessel(toVesselName) < 1)
+		return -1
+	endif
 
 	targetVolume /= 1000
 	if(volume("Buret_mah") <= 0.00005)
