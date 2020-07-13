@@ -79,8 +79,9 @@ STRUCT WMBackgroundStruct &s
 	return 0
 End
 Function doExamineFolder()
+
 	string theList, nextFile, tempStr
-	variable numToProcess = 0
+	variable numToProcess = 0, err
 	NVAR filesProcessed = root:MAH:gFilesProcessed
 	NVAR calvinWorking = root:MAH:gCalvinWorking
 
@@ -105,11 +106,13 @@ Function doExamineFolder()
 			while((V_flag != 0) && numToProcess > -0.5)
 		endif
 		if(V_flag == 0)
-			RunCommandFile(nextFile)
-			DeleteFile/P=watchedFolder nextFile
-			numToProcess -= 1
-			filesProcessed += 1
-			print "Processed file " + nextFile + ". Total files processed = " + num2istr(filesProcessed)
+			err = RunCommandFile(nextFile)
+			if(err > -9)
+				DeleteFile/P=watchedFolder nextFile
+				numToProcess -= 1
+				filesProcessed += 1
+				print "Processed file " + nextFile + ". Total files processed = " + num2istr(filesProcessed)
+			endif
 		else
 			print "There is an unexpected error in StartWatchingFolder."
 		endif
@@ -119,7 +122,7 @@ End
 Function RunCommandFile(fileName)
 string fileName
 	
-	string buffer, cmd, igorCmd, outputFilename, theNote, cwd, cloudPath
+	string buffer, cmd, igorCmd, outputFilename, theNote, cwd, cloudPath,tempPath
 	variable refNum, len, dotPosition
 	NVAR gVerboseReporting = root:MAH:gVerboseReporting, gTANumber = root:MAH:gTAnumber
 	NVAR gGroupNumber = root:MAH:gGroupNumber, gMaxCommands = root:MAH:gMaxCommands
@@ -134,7 +137,16 @@ string fileName
 	endif
 	NewExperiments()	// Closes any open files
 
-	Open/P=watchedFolder/R refNum as fileName
+	// Occassionally Box drops the connection if we try to process the file on Box. To stop this, first copy
+	//   the file to disk, then process.
+	PathInfo tempFolder
+	CopyFile/D/P=watchedFolder/O/Z filename as S_path
+	if(V_flag != 0)
+		Print "Couldn't copy " + filename + " from remote server."
+		return -10
+	endif
+	 
+	Open/P=tempFolder/R refNum as fileName
 	string fullPath = S_fileName
 	
 	variable ii = 0, numCommands = 0
@@ -173,7 +185,10 @@ string fileName
 		endif
 
 	while(ii < 500 && numCommands < gMaxCommands)
+	
+	// Close the command file and remove local copy
 	Close refNum
+	DeleteFile/P=tempFolder/Z fileName
 
 	if(numCommands == gMaxCommands)
 		WriteSimpleErrorToLog(kTooManyCommands, num2istr(gMaxCommands))
@@ -237,6 +252,8 @@ string fileName
 		cmd = "cd '" + cwd + "';mv '" + outputFileName + ".zip' '" + cloudPath + "'"
 		ExecuteUnixShellCommand(cmd)
 	endif
+	
+	return 1
 End
 Function/S StripBadCharacters(fileName)
 string fileName
