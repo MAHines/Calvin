@@ -138,8 +138,8 @@ We have used Calvin to run four experiments at Cornell. Three of the
 experiments are inquiry-driven explorations of acid-base chemistry:
 *pK<sub>a</sub>* of an Unknown Acid-Base Indicator, Identification of an Unknown
 Solid Acid, and Composition of an Unknown Buffer. The have also used it
-to measure the equilibrium constant for a simple reaction, Fe^(3+) +
-SCN^(-) ⇌ FeSCN^(2+). The student guides to these experiments are
+to measure the equilibrium constant for a simple reaction, Fe<sup>3+</sup> +
+SCN<sup>-</sup> ⇌ FeSCN<sup>2+</sup>. The student guides to these experiments are
 available in the Documentation & Experiments folder:
 
 -   [Three Acid-Base
