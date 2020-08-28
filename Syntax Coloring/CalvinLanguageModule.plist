@@ -39,6 +39,7 @@
         <string>Fill_Empty_100ml_Beaker_with_Standardized_Acid</string>
         <string>Fill_Empty_100ml_Beaker_with_Standardized_Buffer</string>
         <string>Fill_Empty_100ml_Beaker_with_Unknown_Buffer</string>
+        <string>Fill_Empty_100ml_Beaker_with_Standardized_Crystal_Violet</string>
         <string>Fill_Empty_100ml_Beaker_with_H2O</string>
         <string>Clean_And_Dry</string>
         <string>Transfer_Soln_with_5ml_Pipette</string>
@@ -54,6 +55,8 @@
         <string>Observe_Color</string>
         <string>Take_Spectrum</string>
         <string>Observe_Color_Range</string>
+        <string>Set_Spectrometer_Temperature</string>
+        <string>Measure_Absorbance_Every_2_Min</string>
         <string>Titrate_Beaker_from_Buret_until_Color_Change</string>
         <string>Verbose_Reporting_On</string>
         <string>Verbose_Reporting_Off</string>
@@ -76,6 +79,9 @@
         <string>into</string>
         <string>buffer</string>
         <string>at</string>
+        <string>degC</string>
+        <string>nm</string>
+        <string>min</string>
     </array>
 	<!-- Specify a comment-out string: -->
 	<key>BBLMCommentLineDefault</key>   <string>//</string>

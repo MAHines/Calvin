@@ -358,6 +358,21 @@ string beakerName
 	WriteToLog(theNote)
 
 End
+Function Fill_Empty_100ml_Beaker_with_Standardized_Crystal_Violet(beakerName)
+string beakerName
+	
+	string theNote, theConc
+	
+	if(Make_New_100ml_Beaker(beakerName) < 0)
+		return -1
+	endif
+	setCVMoles(beakerName, concStandardizedCV() * 0.100)
+	setVolume(beakerName, 0.100)
+	sprintf theConc, "%.3e", concStandardizedCV()
+	theNote = "The beaker " + beakerName + " was filled with 100 ml of " + theConc +  " M standardized crystal violet.\r"
+	WriteToLog(theNote)
+
+End
 Function Fill_Empty_100ml_Beaker_with_H2O(beakerName)
 string beakerName
 	
@@ -516,13 +531,14 @@ constant k_maxVolIndex = 6
 constant k_indMolIndex = 7
 constant k_FeMolIndex = 8
 constant k_SCNmolIndex = 9
+constant k_CVmolIndex = 10		// Crystal Violet
 
 Function MakeEmptyVessel(vesselName)
 string vesselName
 	
 	string keyStr
 	
-	make/n=10 $vesselName
+	make/n=11 $vesselName
 	wave beaker = $vesselName
 	
 	keyStr = "acidName:" + "none" + ";"
@@ -776,8 +792,8 @@ Function AddSolnToSoln(fromVesselName, toVesselName, actualVolume) // Do error c
 string fromVesselName, toVesselName
 variable actualVolume
 	
-	variable iVol, iMolHA, iMolA, iMolxsOH, iMolxsH, iMolH, newIndNum, iMolInd, iMolFe, iMolSCN
-	variable newVol, newMol_HA, newMol_A, newMol_xsOH, newMol_xsH, newMol_Fe, newMol_SCN
+	variable iVol, iMolHA, iMolA, iMolxsOH, iMolxsH, iMolH, newIndNum, iMolInd, iMolFe, iMolSCN, iMolCV
+	variable newVol, newMol_HA, newMol_A, newMol_xsOH, newMol_xsH
 	variable finished = 0
 	wave vessel = $toVesselName
 	
@@ -792,6 +808,7 @@ variable actualVolume
 	iMolInd = indConc(fromVesselName) * actualVolume
 	iMolFe = FeConc(fromVesselName) * actualVolume
 	iMolSCN = SCNconc(fromVesselName) * actualVolume
+	iMolCV = CVconc(fromVesselName) * actualVolume
 	
 	// First add all moles from first vessel to second vessel
 	setAcidMoles(toVesselName, acidMoles(toVesselName) + iMolHA)
@@ -801,6 +818,7 @@ variable actualVolume
 	setIndMoles(toVesselName, indMoles(toVesselName) + iMolInd)
 	setFeMoles(toVesselName, FeMoles(toVesselName) + iMolFe)
 	setSCNmoles(toVesselName, SCNmoles(toVesselName) + iMolSCN)
+	setCVmoles(toVesselName, CVmoles(toVesselName) + iMolCV)
 	
 	// Now subtract moles from first vessel
 	setAcidMoles(fromVesselName, acidMoles(fromVesselName) - iMolHA)
@@ -810,6 +828,7 @@ variable actualVolume
 	setIndMoles(fromVesselName, indMoles(fromVesselName) - iMolInd)
 	setFeMoles(fromVesselName, FeMoles(fromVesselName) - iMolFe)
 	setSCNmoles(fromVesselName, SCNmoles(fromVesselName) - iMolSCN)
+	setCVmoles(fromVesselName, CVmoles(fromVesselName) - iMolCV)
 	
 	// Update volumes, because they are needed for upcoming conc calculations
 	setVolume(fromVesselName, volume(fromVesselName) - actualVolume)
@@ -858,6 +877,11 @@ string vesselName, indicatorName
 	variable indNum
 	
 	// Test for valid indicator
+	if(abs(cmpstr(indicatorName, "crystal_violet")) < 0.1)
+		WriteSimpleErrorToLog(kCrystalVioletError, "")
+		return -1
+	endif
+	
 	indNum = indexOfIndicator(indicatorName)
 	if(indNum < 0)
 		return -1
@@ -887,7 +911,7 @@ End
 Function Observe_Color(vesselName)
 string vesselName
 	
-	variable indNum, thePH, ironConc
+	variable indNum, thePH, ironConc, theCVconc
 	string theNote, topWindow
 	STRUCT color theColor
 
@@ -898,7 +922,8 @@ string vesselName
 	// Make sure there is a valid indicator in the solution	
 	indNum = indicatorNum(vesselName)
 	ironConc = FeConc(vesselName)
-	if((indNum < 0) && !(ironConc > 1e-6))
+	theCVconc = CVconc(vesselName)
+	if((indNum < 0) && !(ironConc > 1e-6) && !(theCVconc > 1e-7))
 		WriteSimpleErrorToLog(kColorlessSolution, vesselName)
 		return -1
 	endif
@@ -940,6 +965,11 @@ variable relativeConcentration
 	variable indNum, ii = 0
 	string theNote, topWindow
 	STRUCT color theColor
+
+	if(abs(cmpstr(indicatorName, "crystal_violet")) < 0.1)
+		WriteSimpleErrorToLog(kCrystalVioletNotIndicator, "")
+		return -1
+	endif
 
 	indNum = indexOfIndicator(indicatorName)
 	if(indNum < 0)
@@ -1023,13 +1053,14 @@ End
 Function MakeSpectrum(vesselName)
 string vesselName
 
-	variable indNum, thePH, refNum, ii, ironConc, specExists
+	variable indNum, thePH, refNum, ii, ironConc, theCVconc, specExists
 	NVAR gSpectrumNumber = root:MAH:gSpectrumNumber
 
-	// Make sure there is either a valid indicator in the solution or some Fe
+	// Make sure there is either a valid indicator in the solution, some Fe, or some CV
 	indNum = indicatorNum(vesselName)
 	ironConc = FeConc(vesselName)
-	if((indNum < 0) && !(ironConc > 1e-6))
+	theCVconc = CVconc(vesselName)
+	if((indNum < 0) && !(ironConc > 1e-6) && !(theCVConc > 3e-8))
 		WriteSimpleErrorToLog(kColorlessSolution, vesselName)
 		return -1
 	endif
@@ -1043,6 +1074,17 @@ string vesselName
 	specExists = 0
 	if(ironConc > 1e-6)
 		MakeFeSpectrum(FeConc(vesselName), SCNconc(vesselName))
+		specExists = 1
+	endif
+	if(theCVConc > 3e-8)
+		if(specExists > 0)
+			wave spectrum = root:MAH:curSpectrum
+			duplicate/FREE spectrum, tempSpectrum
+		endif
+		MakeCVSpectrum(CVconc(vesselName))
+		if(specExists > 0)
+			spectrum += tempSpectrum
+		endif 
 		specExists = 1
 	endif
 	if(!(indNum < 0))
@@ -1074,6 +1116,68 @@ variable FeConc, SCNconc
 	ratFeSCN = FeSCNconc/(wavemax(FeSCNspectrum)/6120)
 	ratFe = equilFeConc/0.01
 	curSpectrum = ratFe * FeSpectrum + ratFeSCN * FeSCNspectrum
+End
+Function MakeCVSpectrum(CVconc)
+variable CVconc
+	
+	make/n=(800 - 380 + 1)/o root:MAH:curSpectrum
+	wave curSpectrum = root:MAH:curSpectrum
+	SetScale/I x 380,800,"nm", curSpectrum
+	wave CVSpectrum = root:MAH:Crystal_Violet_acid
+	curSpectrum = CVconc/2e-5 * CVspectrum
+End
+Function Measure_Absorbance_Every_2_Min(vesselName, wavelength, maxTime)
+string vesselName
+variable wavelength, maxTime
+
+	wave CVspec = root:MAH:crystal_violet_acid
+	variable curTime = 0, curRate, actualTemp, OHconc, newCVconc, err, fracSec
+	string outStr, theNote
+	NVAR specTemp = root:MAH:spectromTemperature
+	
+	// Test for valid flask, wavelength, and maxTime
+	if(validVessel(vesselName) < 1)
+		return -1
+	endif	
+	if((wavelength < leftx(CVspec)) || (wavelength > pnt2x(CVspec, numpnts(CVspec)-1)))
+		WriteSimpleErrorToLog(kWavelengthOutOfRange, num2istr(wavelength))
+		return -1
+	endif
+	if(maxTime > 30)
+		WriteSimpleErrorToLog(kTimeTooLong, num2istr(maxTime))
+		maxTime = 30
+	endif
+	
+	theNote = "Start measuring absorbance of " + vesselName + " at " + num2istr(wavelength) + " nm.\r"
+	WriteToLog(theNote)
+	sprintf outStr, "%.1f", specTemp
+	theNote = "The current spectrometer temperature is " + outStr + "°C.\r"
+	WriteToLog(theNote)
+
+	do
+		// Measure current spectrum
+		err = MakeSpectrum(vesselName)
+		if(err < 0)
+			return -1
+		endif
+		wave spectrum = root:MAH:curSpectrum
+		sprintf outStr, "%.4f", spectrum(wavelength)
+		theNote = "\t" + num2istr(curTime) + " min\t Abs = " + outStr + "\r"
+		WriteToLog(theNote)
+		
+		// Degrade CV for 2 min
+		actualTemp = specTemp + enoise(0.25)
+		OHconc = 10^-(14 - pH(vesselName))
+		fracSec = 0
+		do
+			curRate = 9e11 * exp(-63.18/0.0083145/(actualTemp + 273.15)) * CVconc(vesselName) * OHconc		// in M min-1; Ea = -63.18 kJ/mol
+			newCVconc = CVconc(vesselName) - curRate * 0.01
+			setCVmoles(vesselName, newCVconc * volume(vesselName))
+			fracSec += 0.01
+		while(fracSec < 2)
+		curTime += 2
+	while(curTime < maxTime + 0.1)
+
 End
 
 Function MakeIndSpectrum(indicatorNum, indicatorConc, pKa, pH) // No error checking. Makes wave "curSpectrum"
@@ -1339,6 +1443,13 @@ variable newMoles
 	wave soln = $solnName
 	soln[k_FeMolIndex] = newMoles
 End
+Function setCVMoles(solnName, newMoles)
+string solnName
+variable newMoles
+	
+	wave soln = $solnName
+	soln[k_CVMolIndex] = newMoles
+End
 Function setSCNmoles(solnName, newMoles)
 string solnName
 variable newMoles
@@ -1410,6 +1521,12 @@ string solnName
 	wave soln = $solnName
 	return soln[k_SCNmolIndex]
 End
+Function CVMoles(solnName)
+string solnName
+	
+	wave soln = $solnName
+	return soln[k_CVmolIndex]
+End
 
 Function acidConc(solnName)
 string solnName
@@ -1473,6 +1590,15 @@ string solnName
 	
 	vol = soln[k_solnVolIndex]
 	return vol > 0.001 ? soln[k_SCNmolIndex]/vol : 0
+End
+Function CVconc(solnName)
+string solnName
+	
+	wave soln = $solnName
+	variable vol
+	
+	vol = soln[k_solnVolIndex]
+	return vol > 0.001 ? soln[k_CVmolIndex]/vol : 0
 End
 Function buffer_acidMolarity(bufferNum)
 variable bufferNum
@@ -1605,7 +1731,7 @@ variable targetHOH, targetBuffer
 
 	NVAR concStdOH = root:MAH:concStdOH,concStdH = root:MAH:concStdH, useErrors = root:MAH:useErrors	
 	NVAR pHofStdH2O = root:MAH:pHofStdH2O, concStdBuffer = root:MAH:concStdBuffer
-	NVAR concStdSCN = root:MAH:concStdSCN, concStdFe = root:MAH:concStdFe
+	NVAR concStdSCN = root:MAH:concStdSCN, concStdFe = root:MAH:concStdFe, concStdCV = root:MAH:concStdCV
 
 	
 	concStdOH = targetHOH + useErrors * enoise(0.15 * targetHOH)
@@ -1618,6 +1744,7 @@ variable targetHOH, targetBuffer
 	concStdBuffer = targetBuffer + useErrors * enoise(0.15 * targetBuffer)
 	concStdSCN = 2e-4 * (1 + useErrors * enoise(0.15))
 	concStdFe = 0.20 * (1 + useErrors * enoise(0.15))
+	concStdCV = 2e-5 * (1 + useErrors * enoise(0.15))	// Crystal Violet
 End
 Function concStandardizedOH()
 
@@ -1638,6 +1765,11 @@ Function concStandardizedFe()
 
 	NVAR concStdFe = root:MAH:concStdFe
 	return concStdFe
+End
+Function concStandardizedCV()
+
+	NVAR concStdCV = root:MAH:concStdCV
+	return concStdCV
 End
 Function concStandardizedBuffer()
 
@@ -1691,7 +1823,7 @@ Function InitializeData()
 	endif
 	variable/g useErrors = 1, gVerboseReporting = 1, gSpectrumNumber, gTAnumber
 	variable/g gGroupNumber, gMaxCommands, concStdBuffer, concStdOH, concStdH, pHofStdH2O
-	variable/g concStdSCN, concStdFe
+	variable/g concStdSCN, concStdFe, concStdCV, spectromTemperature
 	variable/g gSolidAcidsEnabled, gBuffersEnabled, gLastLineWasComment, gIgorMenusHidden
 	string/g gRunTime, gCmdFileName, gBadGroupName, gBadTAName, gGroupName
 	string/g gCalvinAcidsMenuString, gCalvinBuffersMenuString, gCalvinHideMenuString
@@ -1703,6 +1835,7 @@ Function InitializeData()
 	gCalvinAcidsMenuString = "Disable Solid Acids"
 	gCalvinBuffersMenuString = "Disable Buffers"
 	gCalvinHideMenuString = "Show All Igor Menus"
+	spectromTemperature = 30 + enoise(9.9)
 	HideIgorMenus
 
 	LoadWave/J/D/W/A/P=startup/K=0/V={","," $",0,0}/L={0,1,0,0,0}/o/q "Indicators.csv"
@@ -1769,6 +1902,7 @@ Function NewExperiments()
 	variable numItems, ii
 	NVAR useErrors = root:MAH:useErrors, gSpectrumNumber = root:MAH:gSpectrumNumber, gTAnumber = root:MAH:gTAnumber
 	NVAR gMaxCommands = root:MAH:gMaxCommands, gLastLineWasComment = root:MAH:gLastLineWasComment
+	NVAR spectromTemperature = root:MAH:spectromTemperature
 	SVAR gRunTime = root:MAH:gRunTime, gGroupName = root:MAH:gGroupName
 	SVAR gBadGroupName = root:MAH:gBadGroupName, gBadTAName = root:MAH:gBadTAName
 	
@@ -1779,6 +1913,7 @@ Function NewExperiments()
 	gBadGroupName = "NoGroup"
 	gBadTAName = "NoTA"
 	gLastLineWasComment = 0
+	spectromTemperature = 30 + enoise(9.9)
 
 	SetupNewLog()
 	
@@ -1820,6 +1955,23 @@ End
 Function Verbose_Reporting_Off()
 	NVAR gVerboseReporting = root:MAH:gVerboseReporting
 	gVerboseReporting = 0
+End
+Function Set_Spectrometer_Temperature(newTemp)
+variable newTemp
+
+	NVAR spectromTemperature = root:MAH:spectromTemperature
+	string outStr, theNote
+	
+	// Make sure newTemp is in correct range
+	if((newTemp > 40.0) || (newTemp < 20))
+		WriteSimpleErrorToLog(kTempOutOfBounds, num2str(newTemp))
+		return -1
+	endif
+	spectromTemperature = 0.1 * round(newTemp * 10)
+	sprintf outStr, "%.1f", spectromTemperature
+	theNote = "The spectrometer temperature was set to " + outStr +  "°C.\r"
+	WriteToLog(theNote)
+	
 End
 Function Set_Group_Name(groupName)
 string groupName

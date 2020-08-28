@@ -18,6 +18,7 @@ Fill_Empty_100ml_Beaker_with_Standardized_Buffer(newName: "beakerName") // Repor
 Fill_Empty_100ml_Beaker_with_Unknown_Buffer(buffer: "bufferName", to: "beakerName")
 Fill_Empty_100ml_Beaker_with_Standardized_KSCN(newName: "beakerName") // Reports exact concentration
 Fill_Empty_100ml_Beaker_with_Standardized_Ferric_Nitrate(newName: "beakerName") // Reports exact concentration
+Fill_Empty_100ml_Beaker_with_Standardized_Crystal_Violet(newName: "beakerName") // Reports exact concentration, near 2e-5 M
 
 // Cleaning vessels after use
 Clean_And_Dry(name: "vesselName") // After cleaning, the name is removed from the vessel
@@ -45,6 +46,8 @@ Measure_pH(of: "vesselName")
 Observe_Color(of: "vesselName") // reports single colored box
 Take_Spectrum(of: "vesselName") // reports spectrum and exports spectrum as .csv
 Observe_Color_Range(of: "indicatorName", at: relativeConcentration) // 1 drop/50 mL = 1.0 conc
+Set_Spectrometer_Temperature(degC: temperature) // Temperatures 20°C – 40°C allowed with 0.1°C resolution
+Measure_Absorbance_Every_2_Min(of: "vesselName", nm: wavelength, min: timeInMin) // Times up to 30 min allowed
 
 // Performing a titration
 Titrate_Beaker_from_Buret_until_Color_Change(into: "vesselName") // reports buret readings, color observed

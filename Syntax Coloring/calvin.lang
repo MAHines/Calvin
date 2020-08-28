@@ -29,6 +29,7 @@
           <keyword>Fill_Empty_100ml_Beaker_with_Standardized_Acid</keyword>
           <keyword>Fill_Empty_100ml_Beaker_with_Standardized_Buffer</keyword>
           <keyword>Fill_Empty_100ml_Beaker_with_Unknown_Buffer</keyword>
+          <keyword>Fill_Empty_100ml_Beaker_with_Standardized_Crystal_Violet</keyword>
           <keyword>Fill_Empty_100ml_Beaker_with_H2O</keyword>
           <keyword>Clean_And_Dry</keyword>
           <keyword>Transfer_Soln_with_5ml_Pipette</keyword>
@@ -43,6 +44,8 @@
           <keyword>Measure_pH</keyword>
           <keyword>Observe_Color</keyword>
           <keyword>Take_Spectrum</keyword>
+          <keyword>Set_Spectrometer_Temperature</keyword>
+          <keyword>Measure_Absorbance_Every_2_Min/keyword>
           <keyword>Observe_Color_Range</keyword>
           <keyword>Titrate_Beaker_from_Buret_until_Color_Change</keyword>
           <keyword>Verbose_Reporting_On</keyword>
@@ -66,6 +69,9 @@
           <keyword>into</keyword>
           <keyword>buffer</keyword>
           <keyword>at</keyword>
+          <keyword>degC</keyword>
+          <keyword>nm</keyword>
+          <keyword>min</keyword>
       </context>
 
       <context id="string" style-ref="string" end-at-line-end="true" class="string" class-disabled="no-spell-check">

@@ -42,6 +42,11 @@ constant kNoSolidAcids = 1029
 constant kNoBuffers = 1030
 constant kTransferToSameVessel = 1031
 constant kConflictingString = 103
+constant kCrystalVioletError = 104
+constant kTempOutOfBounds = 105
+constant kCrystalVioletNotIndicator = 106
+constant kWavelengthOutOfRange = 107
+constant kTimeTooLong = 108
 
 Function WriteSimpleErrorToLog(errType, arg)
 variable errType
@@ -141,6 +146,21 @@ string arg
 			break
 		case kConflictingString:
 			theNote = "The name " + arg + " conflicts with Calvin. Please use a different name.\r"
+			break
+		case kCrystalVioletError:
+			theNote = "You need to use the stock solution of crystal violet.\r"
+			break
+		case kTempOutOfBounds:
+			theNote = "The temperature " + arg + " is not within the operating range of 20°C ≤ T ≤ 40°C.\r"
+			break
+		case kCrystalVioletNotIndicator:
+			theNote = "Crystal violet does not change color over your accessible pH range. It decomposes in basic solutions.\r"
+			break
+		case kWavelengthOutOfRange:
+			theNote = "The wavelength " + arg + " nm is outside the operating range of the spectrometer.\r"
+			break
+		case kTimeTooLong:
+			theNote = "Watching the spectrometer for " + arg + " min would be boring. Stopping at 30 min.\r"
 			break
 		default:			// optional default expression executed
 			theNote = "Unknown error type. You shouldn't see this.\r"

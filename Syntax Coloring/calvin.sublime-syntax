@@ -25,7 +25,7 @@ contexts:
     # strings in YAML. When using single quoted strings, only single quotes
     # need to be escaped: this is done by using two single quotes next to each
     # other.
-    - match: '\b(Make_New_Test_Tube|Make_New_25ml_Volumetric_Flask|Make_New_50ml_Volumetric_Flask|Fill_Volumetric_Flask_with_H2O|Make_New_100ml_Beaker|Fill_Empty_100ml_Beaker_with_Standardized_KSCN|Fill_Empty_100ml_Beaker_with_Standardized_Ferric_Nitrate|Fill_Empty_100ml_Beaker_with_Standardized_Base|Fill_Empty_100ml_Beaker_with_Standardized_Acid|Fill_Empty_100ml_Beaker_with_Standardized_Buffer|Fill_Empty_100ml_Beaker_with_Unknown_Buffer|Fill_Empty_100ml_Beaker_with_H2O|Clean_And_Dry|Transfer_Soln_with_5ml_Pipette|Transfer_Soln_with_10ml_Pipette|Transfer_Soln_with_20ml_Pipette|Transfer_Soln_with_Graduated_Cylinder|Fill_50ml_Buret|Add_Soln_from_Buret|Read_Buret_Volume|Add_Solid_Acid_to_Vessel|Add_One_Drop_of_Indicator|Measure_pH|Observe_Color|Take_Spectrum|Observe_Color_Range|Titrate_Beaker_from_Buret_until_Color_Change|Verbose_Reporting_On|Verbose_Reporting_Off|Observe_Volume|Set_Group_Name|Set_TA_Name)\b'
+    - match: '\b(Fill_Empty_100ml_Beaker_with_Standardized_Crystal_Violet|Set_Spectrometer_Temperature|Measure_Absorbance_Every_2_Min|Make_New_Test_Tube|Make_New_25ml_Volumetric_Flask|Make_New_50ml_Volumetric_Flask|Fill_Volumetric_Flask_with_H2O|Make_New_100ml_Beaker|Fill_Empty_100ml_Beaker_with_Standardized_KSCN|Fill_Empty_100ml_Beaker_with_Standardized_Ferric_Nitrate|Fill_Empty_100ml_Beaker_with_Standardized_Base|Fill_Empty_100ml_Beaker_with_Standardized_Acid|Fill_Empty_100ml_Beaker_with_Standardized_Buffer|Fill_Empty_100ml_Beaker_with_Unknown_Buffer|Fill_Empty_100ml_Beaker_with_H2O|Clean_And_Dry|Transfer_Soln_with_5ml_Pipette|Transfer_Soln_with_10ml_Pipette|Transfer_Soln_with_20ml_Pipette|Transfer_Soln_with_Graduated_Cylinder|Fill_50ml_Buret|Add_Soln_from_Buret|Read_Buret_Volume|Add_Solid_Acid_to_Vessel|Add_One_Drop_of_Indicator|Measure_pH|Observe_Color|Take_Spectrum|Observe_Color_Range|Titrate_Beaker_from_Buret_until_Color_Change|Verbose_Reporting_On|Verbose_Reporting_Off|Observe_Volume|Set_Group_Name|Set_TA_Name)\b'
       scope: keyword.control.example-c
 
   numbers:
@@ -54,7 +54,7 @@ contexts:
     # strings in YAML. When using single quoted strings, only single quotes
     # need to be escaped: this is done by using two single quotes next to each
     # other.
-    - match: '\b(to|newName|from|indicator|name|mL|grams|acid|to|of|into|buffer|at)\b'
+    - match: '\b(deg|nm|min|to|newName|from|indicator|name|mL|grams|acid|to|of|into|buffer|at)\b'
       scope: support.type.example-c
 
 

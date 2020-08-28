@@ -26,6 +26,7 @@ Function InitCommandReader()
 	InsertCommand("Fill_Empty_100ml_Beaker_with_Standardized_Acid")
 	InsertCommand("Fill_Empty_100ml_Beaker_with_Standardized_KSCN")
 	InsertCommand("Fill_Empty_100ml_Beaker_with_Standardized_Ferric_Nitrate")
+	InsertCommand("Fill_Empty_100ml_Beaker_with_Standardized_Crystal_Violet")
 	InsertCommand("Fill_Empty_100ml_Beaker_with_H2O")
 	InsertCommand("Fill_Empty_100ml_Beaker_with_Standardized_Buffer")
 	InsertCommand("Fill_Empty_100ml_Beaker_with_Unknown_Buffer")
@@ -43,6 +44,8 @@ Function InitCommandReader()
 	InsertCommand("Observe_Color_Range")
 	InsertCommand("Titrate_Beaker_from_Buret_until_Color_Change")
 	InsertCommand("Take_Spectrum")
+	InsertCommand("Set_Spectrometer_Temperature")
+	InsertCommand("Measure_Absorbance_Every_2_Min")
 	InsertCommand("Clean_and_Dry")
 	InsertCommand("Verbose_Reporting_On")
 	InsertCommand("Verbose_Reporting_Off")
@@ -417,6 +420,9 @@ string cmd
 	igorCmd = ReplaceString("into:", igorCmd, "")
 	igorCmd = ReplaceString("from:", igorCmd, "")
 	igorCmd = ReplaceString("acid:", igorCmd, "")
+	igorCmd = ReplaceString("degC:", igorCmd, "")
+	igorCmd = ReplaceString("min:", igorCmd, "")
+	igorCmd = ReplaceString("nm:", igorCmd, "")
 	igorCmd = ReplaceString("of:", igorCmd, "")
 	igorCmd = ReplaceString("to:", igorCmd, "")
 	igorCmd = ReplaceString("mL:", igorCmd, "")
@@ -471,6 +477,7 @@ string line
 		case "Fill_Empty_100ml_Beaker_with_Standardized_Acid":
 		case "Fill_Empty_100ml_Beaker_with_Standardized_KSCN":
 		case "Fill_Empty_100ml_Beaker_with_Standardized_Ferric_Nitrate":
+		case "Fill_Empty_100ml_Beaker_with_Standardized_Crystal_Violet":
 		case "Fill_Empty_100ml_Beaker_with_Standardized_Buffer":
 		case "Fill_Empty_100ml_Beaker_with_H2O":
 		case "Fill_50ml_Buret":
@@ -514,6 +521,22 @@ string line
 		case "Add_Soln_from_Buret":
 			if(NumArgs(args) == 2)
 				cleanArgs = ValidateNumStr(args)
+				err = strlen(cleanArgs) == 0 ? -1 : 0
+			else
+				err = -1
+			endif
+			break
+		case "Set_Spectrometer_Temperature":
+			if(NumArgs(args) == 1)
+				cleanArgs = ValidateNum(args)
+				err = strlen(cleanArgs) == 0 ? -1 : 0
+			else
+				err = -1
+			endif
+			break
+		case "Measure_Absorbance_Every_2_Min":
+			if(NumArgs(args) == 3)
+				cleanArgs = ValidateStrNumNum(args)
 				err = strlen(cleanArgs) == 0 ? -1 : 0
 			else
 				err = -1
@@ -634,6 +657,30 @@ string arg
 	endif
 	return ""
 End
+Function/S ValidateNum(arg)
+string arg
+	variable num
+	sscanf arg, "%f", num
+	if(V_flag == 1)
+		return num2str(num)
+	endif
+	return ""
+End
+Function/S ValidateStrNumNum(arg)
+string arg
+	string str
+	variable num1, num2
+	arg = ReplaceString(",", arg, " ")
+	arg = ReplaceString("\"", arg, " ")
+	sscanf arg, "%s %f %f", str, num1, num2
+	if(V_flag == 3 && !CheckIfNum(str))
+		if(CheckIfValidStr(str))
+			return "\"" + str + "\", " + num2str(num1) + ", " + num2str(num2)
+		endif
+	endif
+	return ""
+End
+
 Function/S ValidateStrNum(arg)
 string arg
 	string str1
