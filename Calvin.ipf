@@ -1744,7 +1744,7 @@ variable targetHOH, targetBuffer
 	concStdBuffer = targetBuffer + useErrors * enoise(0.15 * targetBuffer)
 	concStdSCN = 2e-4 * (1 + useErrors * enoise(0.15))
 	concStdFe = 0.20 * (1 + useErrors * enoise(0.15))
-	concStdCV = 2e-5 * (1 + useErrors * enoise(0.15))	// Crystal Violet
+	concStdCV = 1.4e-4 * (1 + useErrors * enoise(0.15))	// Crystal Violet
 End
 Function concStandardizedOH()
 

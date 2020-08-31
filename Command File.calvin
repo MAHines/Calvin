@@ -18,7 +18,7 @@ Fill_Empty_100ml_Beaker_with_Standardized_Buffer(newName: "beakerName") // Repor
 Fill_Empty_100ml_Beaker_with_Unknown_Buffer(buffer: "bufferName", to: "beakerName")
 Fill_Empty_100ml_Beaker_with_Standardized_KSCN(newName: "beakerName") // Reports exact concentration
 Fill_Empty_100ml_Beaker_with_Standardized_Ferric_Nitrate(newName: "beakerName") // Reports exact concentration
-Fill_Empty_100ml_Beaker_with_Standardized_Crystal_Violet(newName: "beakerName") // Reports exact concentration, near 2e-5 M
+Fill_Empty_100ml_Beaker_with_Standardized_Crystal_Violet(newName: "beakerName") // Reports exact concentration, near 1.4e-4 M
 
 // Cleaning vessels after use
 Clean_And_Dry(name: "vesselName") // After cleaning, the name is removed from the vessel
