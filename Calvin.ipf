@@ -1170,7 +1170,7 @@ variable wavelength, maxTime
 		OHconc = 10^-(14 - pH(vesselName))
 		fracSec = 0
 		do
-			curRate = 9e11 * exp(-63.18/0.0083145/(actualTemp + 273.15)) * CVconc(vesselName) * OHconc		// in M min-1; Ea = -63.18 kJ/mol
+			curRate = 1.06e12 * exp(-63.18/0.0083145/(actualTemp + 273.15)) * CVconc(vesselName) * OHconc		// in M min-1; Ea = -63.18 kJ/mol
 			newCVconc = CVconc(vesselName) - curRate * 0.01
 			setCVmoles(vesselName, newCVconc * volume(vesselName))
 			fracSec += 0.01
