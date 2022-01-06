@@ -485,7 +485,6 @@ string line
 		case "Observe_Color":
 		case "Take_Spectrum":
 		case "Titrate_Beaker_from_Buret_until_Color_Change":
-		case "Take_Spectrum":
 		case "Clean_and_Dry":
 		case "Observe_Volume":
 		case "Set_Group_Name":
